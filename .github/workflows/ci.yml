@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Create a local image fixture
+        run: |
+          mkdir -p images
+          node --input-type=module -e "import sharp from 'sharp'; await sharp({ create: { width: 1, height: 1, channels: 3, background: '#ffffff' } }).jpeg().toFile('images/dream.jpg');"
+      - name: Run metadata reader
+        run: npm run read
+      - name: Run metadata removal and verification
+        run: npm run delete

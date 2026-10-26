@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create release archive
+        run: |
+          zip -r "MetaData-${GITHUB_REF_NAME}.zip" \
+            README.md LICENSE package.json package-lock.json \
+            read_metadata.js delete_metadata.js \
+            SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md SUPPORT.md \
+            CITATION.cff CHANGELOG.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: MetaData-${{ github.ref_name }}.zip
